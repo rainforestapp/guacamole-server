@@ -47,10 +47,13 @@ int guac_vnc_user_mouse_handler(guac_user* user, int x, int y, int mask) {
     return 0;
 }
 
-int guac_vnc_user_key_handler(guac_user* user, int keysym, int pressed) {
+int guac_vnc_user_key_handler(guac_user *user, int keysym, int pressed, int keycode) {
 
     guac_vnc_client* vnc_client = (guac_vnc_client*) user->client->data;
-    rfbClient* rfb_client = vnc_client->rfb_client;
+    /* This variable must be named client so we can use the rfbClientSwap32IfLE
+       #defines from libvnc when building our extended key event message */
+    rfbClient* client = vnc_client->rfb_client;
+    guac_vnc_settings* settings = vnc_client->settings;
 
     /* Report key state within recording */
     if (vnc_client->recording != NULL)
@@ -58,8 +61,26 @@ int guac_vnc_user_key_handler(guac_user* user, int keysym, int pressed) {
                 keysym, pressed);
 
     /* Send VNC event only if finished connecting */
-    if (rfb_client != NULL)
-        SendKeyEvent(rfb_client, keysym, pressed);
+    if (client != NULL) {
+      /* send the keycode as well as the keysym if supported */
+      if (settings->ext_qemu_key_events && keycode > 0)
+      {
+        guac_user_log(user, GUAC_LOG_WARNING, "[qemu ext key message] key event: keysym:%x, keycode:%x, pressed:%x", keysym, keycode, pressed);
+        rfbQemuExtKeyEventMsg ke;
+        memset(&ke, 0, sizeof(ke));
+        ke.type = 255;
+        ke.subtype = 0;
+        ke.down = pressed ? 1 : 0;
+        ke.keysym = rfbClientSwap32IfLE(keysym);
+        ke.keycode = rfbClientSwap32IfLE(keycode);
+        WriteToRFBServer(client, (char *)&ke, sz_rfbQemuExtKeyEventMsg);
+      }
+      else /* send just the keysym */
+      {
+        guac_user_log(user, GUAC_LOG_WARNING, "[key message] key event: keysym:%x, pressed:%x", keysym, pressed);
+        SendKeyEvent(client, keysym, pressed);
+      }
+    }
 
     return 0;
 }

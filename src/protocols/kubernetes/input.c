@@ -49,7 +49,7 @@ int guac_kubernetes_user_mouse_handler(guac_user* user,
 
 }
 
-int guac_kubernetes_user_key_handler(guac_user* user, int keysym, int pressed) {
+int guac_kubernetes_user_key_handler(guac_user *user, int keysym, int pressed, int code) {
 
     guac_client* client = user->client;
     guac_kubernetes_client* kubernetes_client =

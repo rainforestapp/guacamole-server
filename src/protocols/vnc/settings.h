@@ -256,6 +256,9 @@ typedef struct guac_vnc_settings {
      */
     bool recording_include_keys;
 
+    /* Whether the server supports extended qemu key events or not */
+    bool ext_qemu_key_events;
+
 } guac_vnc_settings;
 
 /**
