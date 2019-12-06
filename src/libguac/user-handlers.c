@@ -162,11 +162,15 @@ int __guac_handle_mouse(guac_user* user, int argc, char** argv) {
 }
 
 int __guac_handle_key(guac_user* user, int argc, char** argv) {
+    int keycode = 0;
+    if (argc == 3)
+      keycode = atoi(argv[2]);
     if (user->key_handler)
         return user->key_handler(
             user,
             atoi(argv[0]), /* keysym */
-            atoi(argv[1])  /* pressed */
+            atoi(argv[1]), /* pressed */
+            keycode        /* keycode */
         );
     return 0;
 }

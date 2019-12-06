@@ -56,7 +56,7 @@ int guac_telnet_user_mouse_handler(guac_user* user, int x, int y, int mask) {
 
 }
 
-int guac_telnet_user_key_handler(guac_user* user, int keysym, int pressed) {
+int guac_telnet_user_key_handler(guac_user* user, int keysym, int pressed, int code) {
 
     guac_client* client = user->client;
     guac_telnet_client* telnet_client = (guac_telnet_client*) client->data;

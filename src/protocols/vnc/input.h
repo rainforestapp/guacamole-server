@@ -25,6 +25,17 @@
 
 #include <guacamole/user.h>
 
+/* This is the qemu extended key event(for sending keycodes along with keysyms)*/
+typedef struct
+{
+  uint8_t type;     /* always 255 */
+  uint8_t subtype;  /* always 0 */
+  uint16_t down;    /* true if down (press), false if up */
+  uint32_t keysym;  /* key is specified as an X keysym */
+  uint32_t keycode; /* the raw xt keycode */
+} rfbQemuExtKeyEventMsg;
+#define sz_rfbQemuExtKeyEventMsg 12
+
 /**
  * Handler for Guacamole user mouse events.
  */

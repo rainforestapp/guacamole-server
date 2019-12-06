@@ -113,7 +113,7 @@ typedef int guac_user_mouse_handler(guac_user* user, int x, int y,
  *     Zero if the key event was handled successfully, or non-zero if an error
  *     occurred.
  */
-typedef int guac_user_key_handler(guac_user* user, int keysym, int pressed);
+typedef int guac_user_key_handler(guac_user *user, int keysym, int pressed, int code);
 
 /**
  * Handler for Guacamole audio streams received from a user. Each such audio

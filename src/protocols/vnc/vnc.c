@@ -115,11 +115,40 @@ static rfbBool guac_vnc_unlock_write_to_tls(rfbClient* rfb_client) {
 }
 #endif
 
+/* This handler is called if the server supports the qemu extended key psuedoencoding */
+rfbBool HandleQEMUExtEncoding(rfbClient *client, rfbFramebufferUpdateRectHeader *rect) {
+    guac_client *gc = rfbClientGetClientData(client, GUAC_VNC_CLIENT_KEY);
+
+    guac_vnc_client *vnc_client = (guac_vnc_client *)gc->data;
+    guac_vnc_settings *settings = (guac_vnc_settings *)vnc_client->settings;
+
+    /* Enable extended qemu key events since the server supports it */
+    settings->ext_qemu_key_events = true;
+
+    guac_client_log(gc, GUAC_LOG_INFO, "Enabling QEMU extended key event messages(Server indicates support");
+    return TRUE;
+}
+
 rfbClient* guac_vnc_get_client(guac_client* client) {
 
     rfbClient* rfb_client = rfbGetClient(8, 3, 4); /* 32-bpp client */
     guac_vnc_client* vnc_client = (guac_vnc_client*) client->data;
     guac_vnc_settings* vnc_settings = vnc_client->settings;
+
+    /* Register a client extension to declare support for qemu extended key messages */
+    /* -258 is the rfb psuedoencoding for Qemu Extended Key Event support */
+    int qemuEncodings[] = {0xFFFFFEFE /* -258 */, 0};
+    rfbClientProtocolExtension qemuExt = {
+        qemuEncodings,         /* encodings */
+        HandleQEMUExtEncoding, /* handleEncoding */
+        NULL,                  /* handleMessage */
+        NULL,                  /* next extension */
+        // The following 2 fields are part of newer libvnc; the version in debian stretch doesn't have this
+        // See: https://github.com/LibVNC/libvncserver/pull/263
+        // NULL,                  /* securityTypes */
+        // NULL                   /* handleAuthentication */
+    };
+    rfbClientRegisterExtension(&qemuExt);
 
     /* Store Guac client in rfb client */
     rfbClientSetClientData(rfb_client, GUAC_VNC_CLIENT_KEY, client);

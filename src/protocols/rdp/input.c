@@ -123,7 +123,7 @@ int guac_rdp_user_mouse_handler(guac_user* user, int x, int y, int mask) {
     return 0;
 }
 
-int guac_rdp_user_key_handler(guac_user* user, int keysym, int pressed) {
+int guac_rdp_user_key_handler(guac_user *user, int keysym, int pressed, int code) {
 
     guac_client* client = user->client;
     guac_rdp_client* rdp_client = (guac_rdp_client*) client->data;

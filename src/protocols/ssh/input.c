@@ -50,7 +50,7 @@ int guac_ssh_user_mouse_handler(guac_user* user, int x, int y, int mask) {
     return 0;
 }
 
-int guac_ssh_user_key_handler(guac_user* user, int keysym, int pressed) {
+int guac_ssh_user_key_handler(guac_user *user, int keysym, int pressed, int code) {
 
     guac_client* client = user->client;
     guac_ssh_client* ssh_client = (guac_ssh_client*) client->data;
